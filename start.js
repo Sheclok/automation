@@ -37,5 +37,5 @@ const edgePath = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.
 //   await page.click("#install");
 
   console.log("=== [Automation Completed] ===");
-  await browser.close();
+//   await browser.close();
 })();
