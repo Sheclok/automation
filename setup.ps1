@@ -22,7 +22,7 @@ if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
 # -------------------------
 # 3. Tải script Puppeteer
 # -------------------------
-$scriptUrl = "https://raw.githubusercontent.com/yourname/automation/main/start.js"
+$scriptUrl = "https://raw.githubusercontent.com/Sheclok/automation/main/start.js"
 Invoke-WebRequest -Uri $scriptUrl -OutFile "$folder\start.js"
 
 # -------------------------

@@ -23,18 +23,18 @@ const edgePath = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.
   console.log("Đang chờ mã xác minh...");
 
   // Gọi API lấy mã code
-  const res = await fetch("https://your-function-url/api/getcode");
-  const { code } = await res.json();
+//   const res = await fetch("https://your-function-url/api/getcode");
+//   const { code } = await res.json();
 
-  await page.type("#code", code);
-  await page.click("#submit");
+//   await page.type("#code", code);
+//   await page.click("#submit");
 
-  console.log("Đăng nhập thành công!");
+//   console.log("Đăng nhập thành công!");
 
   // Tùy chọn: click cài đặt phần mềm, hoặc thao tác GUI khác
   await page.waitForTimeout(3000);
-  await page.goto("https://example.com/install");
-  await page.click("#install");
+//   await page.goto("https://example.com/install");
+//   await page.click("#install");
 
   console.log("=== [Automation Completed] ===");
   await browser.close();
