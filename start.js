@@ -1,5 +1,4 @@
-import puppeteer from "puppeteer-core";
-import fetch from "node-fetch";
+const puppeteer = require("puppeteer-core");
 
 const edgePath = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
 
@@ -10,32 +9,31 @@ const edgePath = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.
     executablePath: edgePath,
     headless: false,
     defaultViewport: null,
-    args: ["--start-maximized"],
+    ignoreDefaultArgs: ["--enable-automation"], // ❌ bỏ cờ automation
+    args: [
+      "--start-maximized",
+      "--no-sandbox",
+      "--disable-blink-features=AutomationControlled", // ❌ ẩn window.navigator.webdriver
+      "--disable-gpu",
+    ],
   });
 
   const page = await browser.newPage();
-  await page.goto("https://example.com/login");
 
-  // Nhập email
-  await page.type("#email", "your_email@example.com");
-  await page.click("#next");
+  // ⚙️ Loại bỏ thuộc tính 'webdriver' để tránh bị phát hiện
+  await page.evaluateOnNewDocument(() => {
+    Object.defineProperty(navigator, "webdriver", {
+      get: () => undefined,
+    });
+  });
 
-  console.log("Đang chờ mã xác minh...");
+  // ⚙️ Xóa thông báo automation trên UI
+  await page.evaluateOnNewDocument(() => {
+    const newProto = navigator.__proto__;
+    delete newProto.webdriver;
+    navigator.__proto__ = newProto;
+  });
 
-  // Gọi API lấy mã code
-//   const res = await fetch("https://your-function-url/api/getcode");
-//   const { code } = await res.json();
-
-//   await page.type("#code", code);
-//   await page.click("#submit");
-
-//   console.log("Đăng nhập thành công!");
-
-  // Tùy chọn: click cài đặt phần mềm, hoặc thao tác GUI khác
-  await page.waitForTimeout(3000);
-//   await page.goto("https://example.com/install");
-//   await page.click("#install");
-
-  console.log("=== [Automation Completed] ===");
-//   await browser.close();
+  await page.goto("https://example.com");
+  console.log("✅ Edge đã mở và không hiện dòng automation nữa");
 })();
