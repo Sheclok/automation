@@ -1,39 +1,42 @@
-const puppeteer = require("puppeteer-core");
+const puppeteer = require('puppeteer-extra');
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+const path = require('path');
+const fs = require('fs');
+
+puppeteer.use(StealthPlugin());
+
+// === [Log file setup] ===
+const logPath = "C:\\automation\\puppeteer_log.txt";
+fs.appendFileSync(logPath, `${new Date().toISOString()} - [START] Launching Edge...\n`);
 
 const edgePath = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
 
 (async () => {
-  console.log("=== [Automation Started] ===");
+  console.log("=== [Automation Started with Stealth Mode] ===");
 
   const browser = await puppeteer.launch({
     executablePath: edgePath,
     headless: false,
     defaultViewport: null,
-    ignoreDefaultArgs: ["--enable-automation"], // ❌ bỏ cờ automation
+    ignoreDefaultArgs: ["--enable-automation"],
     args: [
       "--start-maximized",
       "--no-sandbox",
-      "--disable-blink-features=AutomationControlled", // ❌ ẩn window.navigator.webdriver
+      "--disable-blink-features=AutomationControlled",
       "--disable-gpu",
+      "--disable-dev-shm-usage"
     ],
   });
 
   const page = await browser.newPage();
 
-  // ⚙️ Loại bỏ thuộc tính 'webdriver' để tránh bị phát hiện
+  // Hide "webdriver" flag manually (extra layer)
   await page.evaluateOnNewDocument(() => {
-    Object.defineProperty(navigator, "webdriver", {
-      get: () => undefined,
-    });
+    Object.defineProperty(navigator, "webdriver", { get: () => undefined });
   });
 
-  // ⚙️ Xóa thông báo automation trên UI
-  await page.evaluateOnNewDocument(() => {
-    const newProto = navigator.__proto__;
-    delete newProto.webdriver;
-    navigator.__proto__ = newProto;
-  });
+  await page.goto("https://pplx.ai/alenpros", { waitUntil: "domcontentloaded" });
+  console.log("Edge opened successfully!");
 
-  await page.goto("https://example.com");
-  console.log("✅ Edge đã mở và không hiện dòng automation nữa");
+  fs.appendFileSync(logPath, `${new Date().toISOString()} - [SUCCESS] Edge launched and page opened.\n`);
 })();
