@@ -15,6 +15,15 @@ if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
     $nodeInstaller = "$env:TEMP\node-setup.msi"
     Invoke-WebRequest -Uri "https://nodejs.org/dist/v20.10.0/node-v20.10.0-x64.msi" -OutFile $nodeInstaller -UseBasicParsing
     Start-Process msiexec.exe -Wait -ArgumentList "/i $nodeInstaller /qn"
+
+    # Add Node.js to PATH for current session
+    $nodePath = "C:\Program Files\nodejs"
+    if (Test-Path $nodePath) {
+        Write-Host "Adding Node.js to PATH..."
+        $env:Path += ";$nodePath"
+    } else {
+        Write-Host "Node.js path not found. Verify installation."
+    }
 } else {
     Write-Host "Node.js already installed"
 }
@@ -34,7 +43,15 @@ Invoke-WebRequest -Uri $runStartUrl -OutFile $runStartPath -UseBasicParsing
 # 5. Install npm packages
 Write-Host "Installing npm packages..."
 Set-Location $folder
-npm install puppeteer-core node-fetch@2
+
+# Reload PATH to ensure npm is available
+$env:Path += ";C:\Program Files\nodejs"
+$npm = Get-Command npm -ErrorAction SilentlyContinue
+if ($null -eq $npm) {
+    Write-Host "npm not found even after PATH update. Please check Node.js installation."
+} else {
+    & npm install puppeteer-core node-fetch@2
+}
 
 # 6. Run Puppeteer once for verification
 $nodePath = (Get-Command node).Source
