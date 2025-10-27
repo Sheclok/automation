@@ -35,7 +35,7 @@ const edgePath = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.
     Object.defineProperty(navigator, "webdriver", { get: () => undefined });
   });
 
-  await page.goto("https://pplx.ai/alenpros", { waitUntil: "domcontentloaded" });
+  await page.goto("https://pplx.ai/brittneysa68862", { waitUntil: "domcontentloaded" });
   console.log("Edge opened successfully!");
 
   fs.appendFileSync(logPath, `${new Date().toISOString()} - [SUCCESS] Edge launched and page opened.\n`);
