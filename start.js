@@ -43,6 +43,7 @@ safeLog("[START] Launching Edge...");
     safeLog("[SUCCESS] Edge launched.");
 
     const page = await browser.newPage();
+        
     await page.evaluateOnNewDocument(() => {
       Object.defineProperty(navigator, "webdriver", { get: () => undefined });
     });
@@ -50,27 +51,43 @@ safeLog("[START] Launching Edge...");
     await page.goto("https://pplx.ai/brittneysa68862", { waitUntil: "domcontentloaded" });
 
     // Claim invitation
+    // Lặp kiểm tra nút Claim invitation xuất hiện và chỉ click khi có
     try {
-      await page.waitForSelector('button', { visible: true, timeout: 8000 });
-      const buttons = await page.$$('button');
-      let clicked = false;
-      for (const btn of buttons) {
-        const text = await btn.evaluate(el => el.innerText.trim());
-        if (text.includes('Claim invitation')) {
-          await btn.click();
-          safeLog('[SUCCESS] Claim invitation button clicked.');
-          console.log('Claim invitation button clicked!');
-          clicked = true;
-          break;
+      let maxRetry = 30; // tử 3-4s cho mỗi lần thử, tổng tối đa ~60-120s (tuỳ chỉnh)
+      let found = false, clicked = false;
+      for (let i = 0; i < maxRetry; i++) {
+        try {
+
+          safeLog(`[DEBUG] page object (${i}): ${JSON.stringify(Object.keys(page))}`);
+
+          const buttons = await page.$$('button');
+          for (const btn of buttons) {
+            const text = await btn.evaluate(el => el.innerText.trim());
+            if (text.includes('Claim invitation')) {
+              found = true;
+              await btn.click();
+              safeLog('[SUCCESS] Claim invitation button clicked.');
+              console.log('Claim invitation button clicked!');
+              clicked = true;
+              break;
+            }
+          }
+          if (clicked) break;
+        } catch (btnErr) {
+          // không log lỗi nhỏ từng lần thử
+        }
+        if (!found) {
+          if (i === 0) safeLog('[INFO] Waiting for Claim invitation...');
+          await new Promise(res => setTimeout(res, 3000)); // chờ 3 giây mỗi lần thử
         }
       }
       if (!clicked) {
-        safeLog('[WARNING] Claim invitation button not found.');
-        console.warn('Claim invitation button not found!');
+        safeLog('[WARNING] Timeout: Claim invitation button not found or not clickable.');
+        console.warn('Timeout: Claim invitation button not found or not clickable.');
       }
     } catch (e) {
-      safeLog('[ERROR] Failed to click Claim invitation button: ' + e.message);
-      console.error('Error clicking Claim invitation:', e);
+      safeLog('[ERROR] Error loop finding/clicking Claim invitation: ' + e.message);
+      console.error('Error loop finding/clicking Claim invitation:', e);
     }
 
     console.log("Edge opened successfully!");
