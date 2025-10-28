@@ -102,7 +102,7 @@ safeLog("[START] Launching Edge...");
       if (!fetchFn) {
         fetchFn = (await import('node-fetch')).default;
       }
-      const apiRes = await fetchFn('https://api.vn60s.com/api/first');
+      const apiRes = await fetchFn('https://api.vn60s.com/api/customers/first');
       if (!apiRes.ok) throw new Error('API request failed: ' + apiRes.status);
       info = await apiRes.json();
       const outMsg = `[API] Id: ${info.Id || ''} | Email: ${info.Email || ''} | Status: ${info.Status || ''} | Code: ${info.Code || ''}`;
