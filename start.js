@@ -98,35 +98,35 @@ safeLog("[START] Launching Edge...");
     // Call API
     let info = {};
     try {
-      let fetchFn = global.fetch;
-      if (!fetchFn) {
-        fetchFn = (await import('node-fetch')).default;
+        let fetchFn = global.fetch;
+        if (!fetchFn) {
+          fetchFn = (await import('node-fetch')).default;
+        }
+        const apiRes = await fetchFn('https://api.vn60s.com/api/customers/first');
+        if (!apiRes.ok) throw new Error('API request failed: ' + apiRes.status);
+        info = await apiRes.json();
+        const outMsg = `[API] Id: ${info.id || ''} | Email: ${info.email || ''} | Status: ${info.status || ''} | Code: ${info.code || ''}`;
+        safeLog(outMsg);
+        console.log(outMsg);
+      } catch (e) {
+        safeLog('[ERROR] API call failed: ' + e.message);
+        console.error('API call error:', e);
       }
-      const apiRes = await fetchFn('https://api.vn60s.com/api/customers/first');
-      if (!apiRes.ok) throw new Error('API request failed: ' + apiRes.status);
-      info = await apiRes.json();
-      const outMsg = `[API] Id: ${info.Id || ''} | Email: ${info.Email || ''} | Status: ${info.Status || ''} | Code: ${info.Code || ''}`;
-      safeLog(outMsg);
-      console.log(outMsg);
-    } catch (e) {
-      safeLog('[ERROR] API call failed: ' + e.message);
-      console.error('API call error:', e);
-    }
-    console.log("API called successfully!");
+      console.log("API called successfully!");
 
-    if (!info || !info.Email) {
-      safeLog('[WARNING] No valid info or Email from API.');
-      console.warn('No valid info or Email from API.');
-      return;
-    }
+      if (!info || !info.email) {
+        safeLog('[WARNING] No valid info or Email from API.');
+        console.warn('No valid info or Email from API.');
+        return;
+      }
 
     // Fill email
     try {
-      if (info.Email) {
+      if (info.email) {
         await page.waitForSelector('input[placeholder="Enter your email"]', { visible: true, timeout: 5000 });
-        await page.type('input[placeholder="Enter your email"]', info.Email, { delay: 50 });
-        safeLog(`[SUCCESS] Filled email (${info.Email}) into input box.`);
-        console.log(`Filled email (${info.Email}) into input box.`);
+        await page.type('input[placeholder="Enter your email"]', info.email, { delay: 50 });
+        safeLog(`[SUCCESS] Filled email (${info.email}) into input box.`);
+        console.log(`Filled email (${info.email}) into input box.`);
       } else {
         safeLog('[WARNING] Không có Email từ API để điền vào input.');
         console.warn('No Email from API to fill input.');
