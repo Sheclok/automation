@@ -29,13 +29,13 @@ if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
 }
 
 # 3. Download start.js
-$scriptUrl = "https://raw.githubusercontent.com/Sheclok/automation/main/start.js"
+$scriptUrl = "https://raw.githubusercontent.com/Sheclok/automation/bri/start.js"
 $scriptPath = "$folder\start.js"
 Write-Host "Downloading start.js..."
 Invoke-WebRequest -Uri $scriptUrl -OutFile $scriptPath -UseBasicParsing
 
 # 4. Download run_start.ps1
-$runStartUrl = "https://raw.githubusercontent.com/Sheclok/automation/main/run_start.ps1"
+$runStartUrl = "https://raw.githubusercontent.com/Sheclok/automation/bri/run_start.ps1"
 $runStartPath = "$folder\run_start.ps1"
 Write-Host "Downloading run_start.ps1..."
 Invoke-WebRequest -Uri $runStartUrl -OutFile $runStartPath -UseBasicParsing
