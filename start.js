@@ -23,6 +23,7 @@ safeLog("[START] Launching Edge...");
 
 (async () => {
   try {
+    
     console.log("=== [Automation Started with Stealth Mode] ===");
 
     const browser = await puppeteer.launch({
