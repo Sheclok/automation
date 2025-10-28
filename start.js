@@ -40,10 +40,13 @@ safeLog("[START] Launching Edge...");
       ],
     });
 
+    // Chờ trình duyệt chạy ổn định
+    await new Promise(res => setTimeout(res, 3000)); // chờ 3 giây
+
     safeLog("[SUCCESS] Edge launched.");
 
     const page = await browser.newPage();
-        
+
     await page.evaluateOnNewDocument(() => {
       Object.defineProperty(navigator, "webdriver", { get: () => undefined });
     });
