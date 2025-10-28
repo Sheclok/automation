@@ -23,8 +23,8 @@ safeLog("[START] Launching Edge...");
 
 (async () => {
   try {
-    
-    console.log("=== [Automation Started with Stealth Mode] ===");
+
+    safeLog("=== [Automation Started with Stealth Mode] ===");
 
     const browser = await puppeteer.launch({
       executablePath: edgePath,
@@ -40,17 +40,114 @@ safeLog("[START] Launching Edge...");
       ],
     });
 
+    safeLog("[SUCCESS] Edge launched.");
+
     const page = await browser.newPage();
     await page.evaluateOnNewDocument(() => {
       Object.defineProperty(navigator, "webdriver", { get: () => undefined });
     });
 
     await page.goto("https://pplx.ai/brittneysa68862", { waitUntil: "domcontentloaded" });
+
+    // Claim invitation
+    try {
+      await page.waitForSelector('button', { visible: true, timeout: 8000 });
+      const buttons = await page.$$('button');
+      let clicked = false;
+      for (const btn of buttons) {
+        const text = await btn.evaluate(el => el.innerText.trim());
+        if (text.includes('Claim invitation')) {
+          await btn.click();
+          safeLog('[SUCCESS] Claim invitation button clicked.');
+          console.log('Claim invitation button clicked!');
+          clicked = true;
+          break;
+        }
+      }
+      if (!clicked) {
+        safeLog('[WARNING] Claim invitation button not found.');
+        console.warn('Claim invitation button not found!');
+      }
+    } catch (e) {
+      safeLog('[ERROR] Failed to click Claim invitation button: ' + e.message);
+      console.error('Error clicking Claim invitation:', e);
+    }
+
     console.log("Edge opened successfully!");
-    safeLog("[SUCCESS] Edge launched and page opened.");
+
+    // Call API
+    let info = {};
+    try {
+      let fetchFn = global.fetch;
+      if (!fetchFn) {
+        fetchFn = (await import('node-fetch')).default;
+      }
+      const apiRes = await fetchFn('https://api.vn60s.com/api/first');
+      if (!apiRes.ok) throw new Error('API request failed: ' + apiRes.status);
+      info = await apiRes.json();
+      const outMsg = `[API] Id: ${info.Id || ''} | Email: ${info.Email || ''} | Status: ${info.Status || ''} | Code: ${info.Code || ''}`;
+      safeLog(outMsg);
+      console.log(outMsg);
+    } catch (e) {
+      safeLog('[ERROR] API call failed: ' + e.message);
+      console.error('API call error:', e);
+    }
+    console.log("API called successfully!");
+
+    if (!info || !info.Email) {
+      safeLog('[WARNING] No valid info or Email from API.');
+      console.warn('No valid info or Email from API.');
+      return;
+    }
+
+    // Fill email
+    try {
+      if (info.Email) {
+        await page.waitForSelector('input[placeholder="Enter your email"]', { visible: true, timeout: 5000 });
+        await page.type('input[placeholder="Enter your email"]', info.Email, { delay: 50 });
+        safeLog(`[SUCCESS] Filled email (${info.Email}) into input box.`);
+        console.log(`Filled email (${info.Email}) into input box.`);
+      } else {
+        safeLog('[WARNING] Không có Email từ API để điền vào input.');
+        console.warn('No Email from API to fill input.');
+      }
+    } catch (e) {
+      safeLog('[ERROR] Fill email failed: ' + e.message);
+      console.error('Error filling email:', e);
+    }
+
+    // Button accept invitation
+    try {
+      await page.waitForSelector('button', { visible: true, timeout: 6000 });
+      const buttons = await page.$$('button');
+      let clicked = false;
+      for (const btn of buttons) {
+        const text = await btn.evaluate(el => el.innerText.trim());
+        if (text.includes('Continue with email')) {
+          // kiểm tra trạng thái disabled
+          const isDisabled = await btn.evaluate(el => el.disabled);
+          if (!isDisabled) {
+            await btn.click();
+            safeLog('[SUCCESS] Continue with email button clicked.');
+            console.log('Continue with email button clicked!');
+            clicked = true;
+          } else {
+            safeLog('[WARNING] Continue with email button is disabled.');
+            console.warn('Continue with email button is disabled.');
+          }
+          break;
+        }
+      }
+      if (!clicked) {
+        safeLog('[WARNING] Continue with email button not found or not clickable.');
+        console.warn('Continue with email button not found or not clickable.');
+      }
+    } catch (e) {
+      safeLog('[ERROR] Error finding/clicking Continue with email button: ' + e.message);
+      console.error('Error finding/clicking Continue with email button:', e);
+    }
 
     //await browser.close();
-    safeLog("[END] Browser closed.");
   } catch (err) {
     console.error("[ERROR] Automation failed:", err);
     safeLog(`[ERROR] ${err.message}`);
