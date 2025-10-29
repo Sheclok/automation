@@ -46,6 +46,12 @@ $oobePath = "$folder\AutoClickOOBE.ps1"
 Write-Host "Downloading AutoClickOOBE.ps1..."
 Invoke-WebRequest -Uri $oobeUrl -OutFile $oobePath -UseBasicParsing
 
+# 6. Download install-comet.ps1
+$oobeUrl = "https://raw.githubusercontent.com/Sheclok/automation/bri/install-comet.ps1"
+$oobePath = "$folder\install-comet.ps1"
+Write-Host "Downloading install-comet.ps1..."
+Invoke-WebRequest -Uri $oobeUrl -OutFile $oobePath -UseBasicParsing
+
 # 5. Install npm packages
 Write-Host "Installing npm packages..."
 Set-Location $folder
