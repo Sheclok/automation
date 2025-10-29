@@ -30,9 +30,9 @@ safeLog("[START] Launching Edge...");
 (async () => {
   try {
 
-    safeLog("=== [Automation Started with Stealth Mode] ===");
 
-    const browser = await puppeteer.launch({
+    safeLog("=== [Automation Started with Stealth Mode] ===");
+    const browserConfig = {
       executablePath: edgePath,
       headless: false, // Azure VM headless
       defaultViewport: null,
@@ -42,13 +42,31 @@ safeLog("[START] Launching Edge...");
         "--disable-blink-features=AutomationControlled",
         "--disable-gpu",
         "--disable-dev-shm-usage",
-        "--window-size=1280,800" // mặc định VM nên set window size
+        "--window-size=1280,800"
       ],
-    });
+    };
+    let browser = null;
+    let launchSuccess = false, lastBrowserErr = null;
+    for (let retry = 1; retry <= 3; retry++) {
+      try {
+        safeLog(`[LAUNCH] Puppeteer.launch attempt ${retry}`);
+        browser = await puppeteer.launch(browserConfig);
+        launchSuccess = true;
+        break;
+      } catch (err) {
+        lastBrowserErr = err;
+        safeLog(`[ERROR] Puppeteer launch failed (attempt ${retry}): ${err.message}`);
+        // Nếu lỗi, chờ 3 giây rồi thử lại
+        await new Promise(res => setTimeout(res, 5000));
+      }
+    }
+    if (!launchSuccess || !browser) {
+      safeLog('[ERROR] Không thể khởi động Edge sau 3 lần thử: ' + (lastBrowserErr && lastBrowserErr.message));
+      throw lastBrowserErr;
+    }
 
     // Chờ trình duyệt chạy ổn định
-    await new Promise(res => setTimeout(res, 3000)); // chờ 3 giây
-
+    await new Promise(res => setTimeout(res, 5000)); // chờ 3 giây
     safeLog("[SUCCESS] Edge launched.");
 
     const page = await browser.newPage();
