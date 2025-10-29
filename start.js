@@ -173,32 +173,28 @@ safeLog("[START] Launching Edge...");
       console.error('Error finding/clicking Continue with email button:', e);
     }
 
-    // Call API get code by email
-    {
-      let fetchFn = global.fetch;
-      if (!fetchFn) fetchFn = (await import('node-fetch')).default;
-      const codeApiUrl = `https://api.vn60s.com/api/customers/code?email=${encodeURIComponent(info.email)}`;
-      let codeInfo = null, success = false, lastErr = null;
-      for (let retry = 1; retry <= 5; retry++) {
-        try {
-          safeLog(`[CALL] Get code by email: ${codeApiUrl} | Retry: ${retry}`);
-          const codeRes = await fetchFn(codeApiUrl);
-          if (!codeRes.ok) throw new Error('API request failed: ' + codeRes.status);
-          codeInfo = await codeRes.json();
-          safeLog(`[API] Code received for email: ${JSON.stringify(codeInfo)} (retry ${retry})`);
-          console.log(`[API] Code received for email:`, codeInfo);
-          success = true;
-          break;
-        } catch (e) {
-          lastErr = e;
-          safeLog(`[WARNING] Get code by email failed (retry ${retry}): ${e.message}`);
-          if (retry < 5) await new Promise(res => setTimeout(res, 2500));
-        }
+    // Call API get code by email, retry mỗi 10 giây nếu chưa có code và không bị expire
+    let codeInfo = null;
+    let fetchFn = global.fetch;
+    if (!fetchFn) fetchFn = (await import('node-fetch')).default;
+    const codeApiUrl = `https://api.vn60s.com/api/customers/code?email=${encodeURIComponent(info.email)}`;
+    let lastErr = null;
+
+    // Luôn chờ đến khi có code, cách 10 giây lấy lại nếu chưa có
+    while (true) {
+      try {
+        safeLog(`[CALL] Get code by email: ${codeApiUrl}`);
+        const codeRes = await fetchFn(codeApiUrl);
+        if (!codeRes.ok) throw new Error('API request failed: ' + codeRes.status);
+        codeInfo = await codeRes.json();
+        safeLog(`[API] Code received for email: ${JSON.stringify(codeInfo)}`);
+        console.log(`[API] Code received for email:`, codeInfo);
+        if (codeInfo && codeInfo.code) break; // Đã có code thì thoát loop
+      } catch (e) {
+        lastErr = e;
+        safeLog(`[WARNING] Get code by email failed: ${e.message}`);
       }
-      if (!success) {
-        safeLog(`[ERROR] All retries API get code by email failed: ${lastErr && lastErr.message}`);
-        console.error('API get code by email error (retry 5):', lastErr);
-      }
+      await new Promise(res => setTimeout(res, 10000)); // đợi 10 giây rồi thử lại
     }
 
     // Fill code into input
@@ -248,37 +244,29 @@ safeLog("[START] Launching Edge...");
     }
         
     // Download and execute installer
-    const downloadPath = 'C:\\Users\\MyComuters\\Downloads\\comet_installer_latest.exe';
-    const maxWaitTime = 120000; // tối đa 120 giây
-    const waitInterval = 3000;  // kiểm tra mỗi 3 giây
-    let waitedTime = 0;
+    const downloadPath = 'C:\Users\MyComuters\Downloads\comet_installer_latest.exe';
+    const waitInterval = 10000;  // kiểm tra mỗi 10 giây
 
     try {
-      // Chờ file tải về
-      while (!fs.existsSync(downloadPath) && waitedTime < maxWaitTime) {
+      // Luôn chờ file tải về, không giới hạn thời gian
+      while (!fs.existsSync(downloadPath)) {
         safeLog(`[INFO] Waiting for download: ${downloadPath}`);
         await new Promise(res => setTimeout(res, waitInterval));
-        waitedTime += waitInterval;
       }
 
-      if (fs.existsSync(downloadPath)) {
-        safeLog('[SUCCESS] File downloaded successfully.');
-        console.log('File downloaded successfully!');
-        // Thực thi cài đặt
-        const { execFile } = require('child_process');
-        execFile(downloadPath, (error) => {
-          if (error) {
-            safeLog('[ERROR] Execute installer failed: ' + error.message);
-            console.error('Execute installer failed:', error);
-          } else {
-            safeLog('[SUCCESS] Installer executed successfully.');
-            console.log('Installer executed successfully.');
-          }
-        });
-      } else {
-        safeLog('[ERROR] Download file not found after waiting.');
-        console.error('Download file not found after waiting.');
-      }
+      // Khi file đã có thì thực thi cài đặt
+      safeLog('[SUCCESS] File downloaded successfully.');
+      console.log('File downloaded successfully!');
+      const { execFile } = require('child_process');
+      execFile(downloadPath, (error) => {
+        if (error) {
+          safeLog('[ERROR] Execute installer failed: ' + error.message);
+          console.error('Execute installer failed:', error);
+        } else {
+          safeLog('[SUCCESS] Installer executed successfully.');
+          console.log('Installer executed successfully.');
+        }
+      });
     } catch (e) {
       safeLog('[ERROR] Download wait/execute failed: ' + e.message);
       console.error('Download wait/execute failed:', e);
