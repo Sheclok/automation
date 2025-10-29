@@ -244,7 +244,7 @@ safeLog("[START] Launching Edge...");
     }
         
     // Download and execute installer
-    const downloadPath = 'C:\Users\MyComuters\Downloads\comet_installer_latest.exe';
+    const downloadPath = 'C:\\Users\\MyComuters\\Downloads\\comet_installer_latest.exe';
     const waitInterval = 10000;  // kiểm tra mỗi 10 giây
 
     try {
