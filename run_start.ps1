@@ -20,7 +20,7 @@ try {
 try {
     # --- Auto click Accept / Next in OOBE ---
     Write-Host "Running AutoClickOOBE.ps1..."
-    Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File 'C:\Scripts\AutoClickOOBE.ps1'" -WindowStyle Hidden
+    Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File 'C:\automation\AutoClickOOBE.ps1'" -WindowStyle Hidden
     Start-Sleep -Seconds 5
     Write-Host "AutoClickOOBE.ps1 executed."
 }
