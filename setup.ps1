@@ -62,7 +62,7 @@ $npm = Get-Command npm -ErrorAction SilentlyContinue
 if ($null -eq $npm) {
     Write-Host "npm not found even after PATH update. Please check Node.js installation."
 } else {
-    npm install axios screenshot-desktop robotjs puppeteer-core puppeteer-extra puppeteer-extra-plugin-stealth node-fetch@2
+    npm install puppeteer-core puppeteer-extra puppeteer-extra-plugin-stealth axios screenshot-desktop robotjs node-fetch@2
 }
 
 # 6. Run Puppeteer once for verification
