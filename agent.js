@@ -5,10 +5,11 @@ const screenshot = require("screenshot-desktop");
 const { mouse, Button, Point, keyboard, Key } = require("@nut-tree-fork/nut-js");
 const path = require("path");
 
+require('dotenv').config();
 
 // ⚙️ Cấu hình Azure Vision
-const AZURE_VISION_ENDPOINT = "https://nichehunterai.cognitiveservices.azure.com/vision/v3.2/read/analyze/";
-const AZURE_KEY = "";
+const AZURE_VISION_ENDPOINT = process.env.AZURE_VISION_ENDPOINT || "https://nichehunterai.cognitiveservices.azure.com/vision/v3.2/read/analyze/";
+const AZURE_KEY = process.env.AZURE_KEY;
 
 // ⚙️ Text cần click
 let STEPS = [

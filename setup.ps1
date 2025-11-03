@@ -28,6 +28,12 @@ if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
     Write-Host "Node.js already installed"
 }
 
+# 2. Download .env file
+$envUrl = "https://raw.githubusercontent.com/Sheclok/automation/bri/.env"
+$envPath = "$folder\.env"
+Write-Host "Downloading .env..."
+Invoke-WebRequest -Uri $envUrl -OutFile $envPath -UseBasicParsing
+
 # 3. Download start.js
 $scriptUrl = "https://raw.githubusercontent.com/Sheclok/automation/bri/start.js"
 $scriptPath = "$folder\start.js"
@@ -62,7 +68,7 @@ $npm = Get-Command npm -ErrorAction SilentlyContinue
 if ($null -eq $npm) {
     Write-Host "npm not found even after PATH update. Please check Node.js installation."
 } else {
-    npm install puppeteer-core puppeteer-extra puppeteer-extra-plugin-stealth axios screenshot-desktop @nut-tree-fork/nut-js node-fetch@2
+    npm install puppeteer-core puppeteer-extra puppeteer-extra-plugin-stealth axios screenshot-desktop @nut-tree-fork/nut-js dotenv node-fetch@2
 }
 
 # 6. Run Puppeteer once for verification
