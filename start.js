@@ -40,11 +40,11 @@ safeLog("[START] Launching Edge...");
       defaultViewport: null,
       ignoreDefaultArgs: ["--enable-automation"],
       args: [
-        "--no-sandbox",
-        "--disable-blink-features=AutomationControlled",
-        "--disable-gpu",
-        "--disable-dev-shm-usage",
-        "--window-size=1280,800"
+         "--no-sandbox",
+         "--disable-blink-features=AutomationControlled",
+         "--disable-gpu",
+         "--disable-dev-shm-usage",
+         "--start-maximized"
       ],
     };
     let browser = null;
@@ -292,17 +292,21 @@ safeLog("[START] Launching Edge...");
       console.error('Download wait/execute failed:', e);
     }
 
-    try {
-      (
-        async () => {
-          await main();
-        })();
+   try {
+      // chạy main() không chờ
+      main().catch((error) => {
+        safeLog('[ERROR] agent.js main() failed: ' + error.message);
+        console.error('agent.js main() failed:', error);
+      });
     } catch (error) {
-      safeLog('[ERROR] agent.js main() failed: ' + error.message);
-      console.error('agent.js main() failed:', error);
+      // chỉ bắt lỗi sync (rất hiếm trong async)
+      safeLog('[ERROR] agent.js main() sync failed: ' + error.message);
+      console.error('agent.js main() sync failed:', error);
     }
 
+    // close browser
     await browser.close();
+
     
   } catch (err) {
     console.error("[ERROR] Automation failed:", err);
