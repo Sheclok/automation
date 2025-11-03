@@ -11,6 +11,8 @@ require('dotenv').config();
 const AZURE_VISION_ENDPOINT = process.env.AZURE_VISION_ENDPOINT || "https://nichehunterai.cognitiveservices.azure.com/vision/v3.2/read/analyze/";
 const AZURE_KEY = process.env.AZURE_KEY;
 
+console.log("🤖 Automation Agent started...");
+
 // ⚙️ Text cần click
 let STEPS = [
   { id: 1, text: "Start Install", status: "New", wait: 5, maxRetryTime: 5 },
