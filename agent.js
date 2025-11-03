@@ -5,11 +5,11 @@ const screenshot = require("screenshot-desktop");
 const { mouse, Button, Point, keyboard, Key } = require("@nut-tree-fork/nut-js");
 const path = require("path");
 
-require('dotenv').config();
+//require('dotenv').config();
 
 // ⚙️ Cấu hình Azure Vision
-const AZURE_VISION_ENDPOINT = process.env.AZURE_VISION_ENDPOINT || "https://nichehunterai.cognitiveservices.azure.com/vision/v3.2/read/analyze/";
-const AZURE_KEY = process.env.AZURE_KEY;
+const AZURE_VISION_ENDPOINT = "https://nichehunterai.cognitiveservices.azure.com/vision/v3.2/read/analyze/";
+const AZURE_KEY = "6Pcg0B7mMmHtzj5hjKzIA42Y7UFv9Y0uLK7Pmeeed2u5kl3BzcwQJQQJ99BGACYeBjFXJ3w3AAABACOGTD05";
 
 console.log("🤖 Automation Agent started...");
 
