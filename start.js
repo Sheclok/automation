@@ -302,7 +302,8 @@ safeLog("[START] Launching Edge...");
       console.error('agent.js main() failed:', error);
     }
 
-      //await browser.close();
+    await browser.close();
+    
   } catch (err) {
     console.error("[ERROR] Automation failed:", err);
     safeLog(`[ERROR] ${err.message}`);

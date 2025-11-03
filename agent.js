@@ -2,7 +2,7 @@
 const fs = require("fs");
 const axios = require("axios");
 const screenshot = require("screenshot-desktop");
-const robot = require("robotjs");
+const { mouse, Button, Point } = require("@nut-tree-fork/nut-js");
 
 // ⚙️ Cấu hình Azure Vision
 const AZURE_VISION_ENDPOINT = "https://nichehunterai.cognitiveservices.azure.com/vision/v3.2/read/analyze/";
@@ -66,8 +66,8 @@ async function main() {
     console.log(`✅ Tìm thấy "${found.text}" tại (${clickX}, ${clickY})`);
 
     // 🖱️ Click vào toạ độ
-    robot.moveMouse(clickX, clickY);
-    robot.mouseClick();
+    await mouse.setPosition(new Point(clickX, clickY));
+    await mouse.click(Button.LEFT);
     console.log("🖱️ Đã click!");
 
     // (Tuỳ chọn) Gửi log hoặc ảnh
