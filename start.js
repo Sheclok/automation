@@ -305,7 +305,7 @@ safeLog("[START] Launching Edge...");
     }
 
     // close browser
-    //await browser.close();
+    await browser.close();
 
     
   } catch (err) {
