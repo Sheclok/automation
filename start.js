@@ -9,7 +9,7 @@ puppeteer.use(StealthPlugin());
 
 // === [Log file setup] ===
 // environment variable để override log & browser, fallback
-const logPath = process.env.AUTOMATION_LOG_PATH || path.join(__dirname, 'puppeteer_log.txt');
+const logPath = process.env.AUTOMATION_LOG_PATH || path.join(__dirname, 'log.txt');
 const edgePath = process.env.EDGE_PATH || "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
 
 function safeLog(data) {

@@ -1,9 +1,20 @@
 // agent.js
+const path = require("path");
+
+// === [Log file setup] ===
+const logPath = process.env.AUTOMATION_LOG_PATH || path.join(__dirname, 'log.txt');
+
+function safeLog(data) {
+  try {
+    fs.appendFileSync(logPath, `${new Date().toISOString()} - ${data}\n`);
+  } catch (err) {
+    console.error(`[ERROR] Cannot write log to ${logPath}:`, err);
+  }
+}
 const fs = require("fs");
 const axios = require("axios");
 const screenshot = require("screenshot-desktop");
 const { mouse, Button, Point, keyboard, Key } = require("@nut-tree-fork/nut-js");
-const path = require("path");
 
 //require('dotenv').config();
 
@@ -11,7 +22,7 @@ const path = require("path");
 const AZURE_VISION_ENDPOINT = "https://nichehunterai.cognitiveservices.azure.com/vision/v3.2/read/analyze/";
 const AZURE_KEY = "6Pcg0B7mMmHtzj5hjKzIA42Y7UFv9Y0uLK7Pmeeed2u5kl3BzcwQJQQJ99BGACYeBjFXJ3w3AAABACOGTD05";
 
-console.log("🤖 Automation Agent started...");
+safeLog("🤖 Automation Agent started...");
 
 // ⚙️ Text cần click
 let STEPS = [
@@ -29,12 +40,12 @@ let STEPS = [
     wait: 5,
     maxRetryTime: 3,
     postAction: async () => {
-      console.log("🪟 Đã mở form Setting Default — sẽ đóng lại...");
+  safeLog("🪟 Đã mở form Setting Default — sẽ đóng lại...");
       await new Promise((r) => setTimeout(r, 4000)); // chờ form hiện rõ
       await keyboard.pressKey(Key.LeftAlt, Key.F4);
       await keyboard.releaseKey(Key.LeftAlt, Key.F4);
       await new Promise((r) => setTimeout(r, 1000));
-      console.log("✅ Form Setting Default đã đóng!");
+  safeLog("✅ Form Setting Default đã đóng!");
     },
   },
   { id: 9, text: "Start Comet", status: "New", wait: 3, maxRetryTime: 3 },
@@ -42,14 +53,28 @@ let STEPS = [
     id: 10,
     text: "Enter your email",
     status: "New",
-    wait: 10,
-    maxRetryTime: 3,
+    wait: 5,
+    maxRetryTime: 10,
     postAction: async () => {
       const email = emailFromLog || "";
-      console.log(`⌨️ Đang nhập email: ${email}`);
+  safeLog(`⌨️ Đang nhập email: ${email}`);
       await keyboard.type(email);
       await new Promise((r) => setTimeout(r, 1000));
-      console.log("✅ Đã nhập email!");
+  safeLog("✅ Đã nhập email!");
+    },
+  },
+  {
+    id: 11,
+    text: "Enter Code",
+    status: "New",
+    wait: 5,
+    maxRetryTime: 10,
+    postAction: async () => {
+      const code = await getCodeByEmail(emailFromLog || "");
+  safeLog(`⌨️ Đang nhập code: ${code}`);
+      await keyboard.type(code);
+      await new Promise((r) => setTimeout(r, 1000));
+  safeLog("✅ Đã nhập code!");
     },
   },
 ];
@@ -65,7 +90,7 @@ function getLastEmailFromLog(logFile) {
   }
   return null;
 }
-const logPath = path.join(__dirname, 'puppeteer_log.txt'); // giống bên start.js
+
 const emailFromLog = getLastEmailFromLog(logPath);
 
 // 🧠 OCR + Click
@@ -79,7 +104,7 @@ async function findAndClickText(targetText, maxRetryTime = 10, stepId = 0) {
   if (!fs.existsSync(folder)) fs.mkdirSync(folder, { recursive: true });
 
   for (let attempt = 1; attempt <= maxTries; attempt++) {
-    console.log(`🔍 (${attempt}/${maxTries}) Tìm "${targetText}"...`);
+  safeLog(`🔍 (${attempt}/${maxTries}) Tìm "${targetText}"...`);
 
     // 📸 Lưu hình theo step và thứ tự thử
     const imgPath = path.join(folder, `step${stepId}_${safeText}_try${attempt}.jpg`);
@@ -118,24 +143,24 @@ async function findAndClickText(targetText, maxRetryTime = 10, stepId = 0) {
         const box = found.boundingBox;
         const clickX = (box[0] + box[2]) / 2;
         const clickY = (box[1] + box[5]) / 2;
-        console.log(`✅ Tìm thấy "${found.text}" tại (${clickX}, ${clickY})`);
+  safeLog(`✅ Tìm thấy "${found.text}" tại (${clickX}, ${clickY})`);
 
         await mouse.setPosition(new Point(clickX, clickY));
         await mouse.click(Button.LEFT);
-        console.log(`🖱️ Đã click "${found.text}"!`);
+  safeLog(`🖱️ Đã click "${found.text}"!`);
         return true;
       }
     } catch (err) {
-      console.log(`⚠️ OCR lỗi (${attempt}):`, err.message);
+  safeLog(`⚠️ OCR lỗi (${attempt}): ${err.message}`);
     }
 
     if (attempt < maxTries) {
-      console.log(`⏳ Chờ ${retryInterval / 1000}s rồi thử lại...`);
+  safeLog(`⏳ Chờ ${retryInterval / 1000}s rồi thử lại...`);
       await new Promise((r) => setTimeout(r, retryInterval));
     }
   }
 
-  console.log(`❌ Không tìm thấy "${targetText}" sau ${maxRetryTime}s.`);
+  safeLog(`❌ Không tìm thấy "${targetText}" sau ${maxRetryTime}s.`);
   return false;
 }
 
@@ -143,15 +168,15 @@ async function findAndClickText(targetText, maxRetryTime = 10, stepId = 0) {
 async function main() {
   try {
     for (const step of STEPS) {
-      console.log(`\n=== 🧩 Step ${step.id}: "${step.text}" | Status: ${step.status} ===`);
+  safeLog(`\n=== 🧩 Step ${step.id}: "${step.text}" | Status: ${step.status} ===`);
 
       if (step.status !== "New") {
-        console.log("⏭️ Bỏ qua (đã xử lý trước đó).");
+  safeLog("⏭️ Bỏ qua (đã xử lý trước đó).");
         continue;
       }
 
       if (step.wait > 0) {
-        console.log(`⏳ Đợi ${step.wait}s để màn hình ổn định trước khi tìm "${step.text}"...`);
+  safeLog(`⏳ Đợi ${step.wait}s để màn hình ổn định trước khi tìm "${step.text}"...`);
         await new Promise((r) => setTimeout(r, step.wait * 1000));
       }
 
@@ -159,32 +184,32 @@ async function main() {
 
       if (success) {
         step.status = "Done";
-        console.log(`✅ Hoàn tất Step ${step.id}: "${step.text}"`);
+  safeLog(`✅ Hoàn tất Step ${step.id}: "${step.text}"`);
 
          // 🔧 Nếu có hành động sau khi click, chạy nó
         if (typeof step.postAction === "function") {
           try {
             await step.postAction();
           } catch (e) {
-            console.log(`⚠️ Lỗi khi chạy postAction Step ${step.id}:`, e.message);
+            safeLog(`⚠️ Lỗi khi chạy postAction Step ${step.id}: ${e.message}`);
           }
         }
 
         if (step.wait > 0) {
-          console.log(`⏳ Đợi ${step.wait}s trước bước tiếp theo...`);
+          safeLog(`⏳ Đợi ${step.wait}s trước bước tiếp theo...`);
           await new Promise((r) => setTimeout(r, step.wait * 1000));
         }
       } else {
         step.status = "Failed";
-        console.log(`❌ Step ${step.id} thất bại, dừng pipeline.`);
+  safeLog(`❌ Step ${step.id} thất bại, dừng pipeline.`);
         break;
       }
     }
 
-    console.log("\n📋 Tóm tắt trạng thái:");
-    STEPS.forEach((s) => console.log(`- Step ${s.id}: ${s.text} => ${s.status}`));
+  safeLog("\n📋 Tóm tắt trạng thái:");
+  STEPS.forEach((s) => safeLog(`- Step ${s.id}: ${s.text} => ${s.status}`));
   } catch (err) {
-    console.error("❌ Lỗi:", err.message);
+  safeLog(`❌ Lỗi: ${err.message}`);
   }
 }
 
@@ -194,4 +219,21 @@ module.exports = { main };
 // Tuỳ chọn: chạy trực tiếp file này
 if (require.main === module) {
   main();
+}
+
+async function getCodeByEmail(email) {
+  const fetchFn = (typeof fetch !== 'undefined' ? fetch : (await import('node-fetch')).default);
+  const codeApiUrl = `https://api.vn60s.com/api/customers/code?email=${encodeURIComponent(email)}`;
+  let codeInfo = null;
+  while (true) {
+    try {
+      const codeRes = await fetchFn(codeApiUrl);
+      if (!codeRes.ok) throw new Error('API request failed: ' + codeRes.status);
+      codeInfo = await codeRes.json();
+      if (codeInfo && codeInfo.code) return codeInfo.code;
+    } catch (e) {
+      // chỉ log nếu cần
+    }
+    await new Promise(res => setTimeout(res, 10000)); // đợi 10s rồi thử lại
+  }
 }
