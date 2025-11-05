@@ -18,18 +18,5 @@ try {
     Add-Content $logPath "$(Get-Date): Error - $_"
 }
 
-# try {
-#     # Start OOBE ---
-#     Add-Content $logPath "$(Get-Date): Running AutoClickOOBE.ps1..."
-#     Write-Host "Running AutoClickOOBE.ps1..."
-#     Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File 'C:\automation\AutoClickOOBE.ps1'" -WindowStyle Hidden
-#     Start-Sleep -Seconds 5
-#     Write-Host "AutoClickOOBE.ps1 executed."
-#     Add-Content $logPath "$(Get-Date): AutoClickOOBE.ps1 executed."
-# }
-# catch {
-#     Add-Content $logPath "$(Get-Date): Error running AutoClickOOBE.ps1 - $_"
-#     Write-Error "Error running AutoClickOOBE.ps1: $_"
-# }    
 
 Write-Host "=== [Auto Start Edge Script Completed] ==="

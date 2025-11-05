@@ -46,12 +46,6 @@ $runStartPath = "$folder\run_start.ps1"
 Write-Host "Downloading run_start.ps1..."
 Invoke-WebRequest -Uri $runStartUrl -OutFile $runStartPath -UseBasicParsing
 
-# 5. Download AutoClickOOBE.ps1
-$oobeUrl = "https://raw.githubusercontent.com/Sheclok/automation/bri/AutoClickOOBE.ps1"
-$oobePath = "$folder\AutoClickOOBE.ps1"
-Write-Host "Downloading AutoClickOOBE.ps1..."
-Invoke-WebRequest -Uri $oobeUrl -OutFile $oobePath -UseBasicParsing
-
 # 5. Download agent.js
 $oobeUrl = "https://raw.githubusercontent.com/Sheclok/automation/bri/agent.js"
 $oobePath = "$folder\agent.js"
@@ -96,18 +90,10 @@ Register-ScheduledTask -Action $Action -Trigger $Trigger -TaskName $TaskName -Us
 Write-Host "Scheduled task created: $TaskName for user $User"
 
 Write-Host "Skipping OOBE setup screens..."
-
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE" /v "SkipMachineOOBE" /t REG_DWORD /d 1 /f
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE" /v "SkipUserOOBE" /t REG_DWORD /d 1 /f
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE" /v "HideEULAPage" /t REG_DWORD /d 1 /f
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLUA" /t REG_DWORD /d 0 /f
-
 Write-Host "OOBE auto-skip configured."
-
-# Register task to auto-run OOBE clicker when user logs in
-$Action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -File C:\automation\AutoClickOOBE.ps1"
-$Trigger = New-ScheduledTaskTrigger -AtLogOn
-Register-ScheduledTask -Action $Action -Trigger $Trigger -TaskName "AutoClickOOBE" -RunLevel Highest -Force
-
 
 Write-Host "=== [Setup Completed Successfully] ==="
