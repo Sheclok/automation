@@ -63,7 +63,9 @@ let STEPS = [
         throw new Error("Email không hợp lệ");
       }
       safeLog(`⌨️ Đang nhập email: ${email}`);
-      await keyboard.type(email);
+        await keyboard.type(email);
+        await keyboard.pressKey(Key.Enter);
+        await keyboard.releaseKey(Key.Enter);
       await new Promise((r) => setTimeout(r, 1000));
       safeLog("✅ Đã nhập email!");
     },
