@@ -38,7 +38,35 @@ let STEPS = [
     },
   },
   { id: 9, text: "Start Comet", status: "New", wait: 3, maxRetryTime: 3 },
+  {
+    id: 10,
+    text: "Enter your email",
+    status: "New",
+    wait: 3,
+    maxRetryTime: 3,
+    postAction: async () => {
+      const email = emailFromLog || "";
+      console.log(`⌨️ Đang nhập email: ${email}`);
+      await keyboard.type(email);
+      await new Promise((r) => setTimeout(r, 1000));
+      console.log("✅ Đã nhập email!");
+    },
+  },
 ];
+
+// Lấy email từ log start.js
+function getLastEmailFromLog(logFile) {
+  if (!fs.existsSync(logFile)) return null;
+  const logLines = fs.readFileSync(logFile, 'utf-8').split('\n');
+  for (let i = logLines.length - 1; i >= 0; i--) {
+    const line = logLines[i];
+    const match = line.match(/\\[API\\].*Email: ([^ |]+) */);
+    if (match) return match[1];
+  }
+  return null;
+}
+const logPath = path.join(__dirname, 'puppeteer_log.txt'); // giống bên start.js
+const emailFromLog = getLastEmailFromLog(logPath);
 
 // 🧠 OCR + Click
 async function findAndClickText(targetText, maxRetryTime = 10, stepId = 0) {
