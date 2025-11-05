@@ -31,7 +31,8 @@ let STEPS = [
     postAction: async () => {
       console.log("🪟 Đã mở form Setting Default — sẽ đóng lại...");
       await new Promise((r) => setTimeout(r, 4000)); // chờ form hiện rõ
-      await keyboard.type(Key.Escape); // hoặc Alt+F4 tùy trường hợp
+      await keyboard.pressKey(Key.LeftAlt, Key.F4);
+      await keyboard.releaseKey(Key.LeftAlt, Key.F4);
       await new Promise((r) => setTimeout(r, 1000));
       console.log("✅ Form Setting Default đã đóng!");
     },
