@@ -42,7 +42,7 @@ let STEPS = [
     id: 10,
     text: "Enter your email",
     status: "New",
-    wait: 3,
+    wait: 10,
     maxRetryTime: 3,
     postAction: async () => {
       const email = emailFromLog || "";
