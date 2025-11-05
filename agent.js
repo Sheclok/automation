@@ -58,10 +58,14 @@ let STEPS = [
     maxRetryTime: 10,
     postAction: async () => {
       const email = emailFromLog || "";
-  safeLog(`⌨️ Đang nhập email: ${email}`);
+      if (!email) {
+        safeLog("❌ Không tìm thấy email, dừng tại step 10!");
+        throw new Error("Email không hợp lệ");
+      }
+      safeLog(`⌨️ Đang nhập email: ${email}`);
       await keyboard.type(email);
       await new Promise((r) => setTimeout(r, 1000));
-  safeLog("✅ Đã nhập email!");
+      safeLog("✅ Đã nhập email!");
     },
   },
   {
@@ -72,10 +76,10 @@ let STEPS = [
     maxRetryTime: 10,
     postAction: async () => {
       const code = await getCodeByEmail(emailFromLog || "");
-  safeLog(`⌨️ Đang nhập code: ${code}`);
+      safeLog(`⌨️ Đang nhập code: ${code}`);
       await keyboard.type(code);
       await new Promise((r) => setTimeout(r, 1000));
-  safeLog("✅ Đã nhập code!");
+      safeLog("✅ Đã nhập code!");
     },
   },
 ];
@@ -84,7 +88,7 @@ let STEPS = [
 function getLastEmailFromLog(logPathMail) {
   return fs.existsSync(logPathMail) ? fs.readFileSync(logPathMail, 'utf-8').trim() : null;
 }
-const emailFromLog = getLastEmailFromLog(logPath);
+const emailFromLog = getLastEmailFromLog(logPathMail);
 
 async function getCodeByEmail(email) {
   const fetchFn = (typeof fetch !== 'undefined' ? fetch : (await import('node-fetch')).default);
@@ -153,24 +157,24 @@ async function findAndClickText(targetText, maxRetryTime = 10, stepId = 0) {
         const box = found.boundingBox;
         const clickX = (box[0] + box[2]) / 2;
         const clickY = (box[1] + box[5]) / 2;
-  safeLog(`✅ Tìm thấy "${found.text}" tại (${clickX}, ${clickY})`);
+        safeLog(`✅ Tìm thấy "${found.text}" tại (${clickX}, ${clickY})`);
 
         await mouse.setPosition(new Point(clickX, clickY));
         await mouse.click(Button.LEFT);
-  safeLog(`🖱️ Đã click "${found.text}"!`);
+        safeLog(`🖱️ Đã click "${found.text}"!`);
         return true;
       }
     } catch (err) {
-  safeLog(`⚠️ OCR lỗi (${attempt}): ${err.message}`);
+        safeLog(`⚠️ OCR lỗi (${attempt}): ${err.message}`);
     }
 
     if (attempt < maxTries) {
-  safeLog(`⏳ Chờ ${retryInterval / 1000}s rồi thử lại...`);
+      safeLog(`⏳ Chờ ${retryInterval / 1000}s rồi thử lại...`);
       await new Promise((r) => setTimeout(r, retryInterval));
     }
   }
 
-  safeLog(`❌ Không tìm thấy "${targetText}" sau ${maxRetryTime}s.`);
+    safeLog(`❌ Không tìm thấy "${targetText}" sau ${maxRetryTime}s.`);
   return false;
 }
 
