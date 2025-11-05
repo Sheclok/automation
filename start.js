@@ -20,6 +20,15 @@ function safeLog(data) {
   }
 }
 
+function safeLogMail(data) {
+  try {
+      var logPathMail = path.join(__dirname, 'mail.txt');
+      fs.appendFileSync(logPathMail, `${data}\n`);
+  } catch (err) {
+    console.error(`[ERROR] Cannot write log to ${logPathMail}:`, err);
+  }
+}
+
 try {
   console.log(process.env.USERNAME);
   console.log(require('os').userInfo().username);
@@ -132,6 +141,9 @@ safeLog("[START] Launching Edge...");
         if (!apiRes.ok) throw new Error('API request failed: ' + apiRes.status);
         info = await apiRes.json();
         const outMsg = `[API] Id: ${info.id || ''} | Email: ${info.email || ''} | Status: ${info.status || ''} | Code: ${info.code || ''}`;
+
+        safeLogMail(info.email);
+
         safeLog(outMsg);
         console.log(outMsg);
       } catch (e) {

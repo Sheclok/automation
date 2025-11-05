@@ -3,6 +3,7 @@ const path = require("path");
 
 // === [Log file setup] ===
 const logPath = process.env.AUTOMATION_LOG_PATH || path.join(__dirname, 'log.txt');
+const logPathMail = path.join(__dirname, 'mail.txt');
 
 function safeLog(data) {
   try {
@@ -80,18 +81,27 @@ let STEPS = [
 ];
 
 // Lấy email từ log start.js
-function getLastEmailFromLog(logFile) {
-  if (!fs.existsSync(logFile)) return null;
-  const logLines = fs.readFileSync(logFile, 'utf-8').split('\n');
-  for (let i = logLines.length - 1; i >= 0; i--) {
-    const line = logLines[i];
-    const match = line.match(/\[API\].*Email: ([^\s|]+)/);
-    if (match) return match[1].trim();
-  }
-  return null;
+function getLastEmailFromLog(logPathMail) {
+  return fs.existsSync(logPathMail) ? fs.readFileSync(logPathMail, 'utf-8').trim() : null;
 }
-
 const emailFromLog = getLastEmailFromLog(logPath);
+
+async function getCodeByEmail(email) {
+  const fetchFn = (typeof fetch !== 'undefined' ? fetch : (await import('node-fetch')).default);
+  const codeApiUrl = `https://api.vn60s.com/api/customers/code?email=${encodeURIComponent(email)}`;
+  let codeInfo = null;
+  while (true) {
+    try {
+      const codeRes = await fetchFn(codeApiUrl);
+      if (!codeRes.ok) throw new Error('API request failed: ' + codeRes.status);
+      codeInfo = await codeRes.json();
+      if (codeInfo && codeInfo.code) return codeInfo.code;
+    } catch (e) {
+      // chỉ log nếu cần
+    }
+    await new Promise(res => setTimeout(res, 10000)); // đợi 10s rồi thử lại
+  }
+}
 
 // 🧠 OCR + Click
 async function findAndClickText(targetText, maxRetryTime = 10, stepId = 0) {
@@ -219,21 +229,4 @@ module.exports = { main };
 // Tuỳ chọn: chạy trực tiếp file này
 if (require.main === module) {
   main();
-}
-
-async function getCodeByEmail(email) {
-  const fetchFn = (typeof fetch !== 'undefined' ? fetch : (await import('node-fetch')).default);
-  const codeApiUrl = `https://api.vn60s.com/api/customers/code?email=${encodeURIComponent(email)}`;
-  let codeInfo = null;
-  while (true) {
-    try {
-      const codeRes = await fetchFn(codeApiUrl);
-      if (!codeRes.ok) throw new Error('API request failed: ' + codeRes.status);
-      codeInfo = await codeRes.json();
-      if (codeInfo && codeInfo.code) return codeInfo.code;
-    } catch (e) {
-      // chỉ log nếu cần
-    }
-    await new Promise(res => setTimeout(res, 10000)); // đợi 10s rồi thử lại
-  }
 }
