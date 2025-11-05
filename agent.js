@@ -85,8 +85,8 @@ function getLastEmailFromLog(logFile) {
   const logLines = fs.readFileSync(logFile, 'utf-8').split('\n');
   for (let i = logLines.length - 1; i >= 0; i--) {
     const line = logLines[i];
-    const match = line.match(/\\[API\\].*Email: ([^ |]+) */);
-    if (match) return match[1];
+    const match = line.match(/\[API\].*Email: ([^\s|]+)/);
+    if (match) return match[1].trim();
   }
   return null;
 }
