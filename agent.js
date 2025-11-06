@@ -3,7 +3,7 @@ const path = require("path");
 
 // === [Log file setup] ===
 const logPath = process.env.AUTOMATION_LOG_PATH || path.join(__dirname, 'log.txt');
-const logPathMail = path.join(__dirname, 'mail.txt');
+//const logPathMail = path.join(__dirname, 'mail.txt');
 
 function safeLog(data) {
   try {
@@ -106,6 +106,8 @@ function getLastEmailFromLog(logPathMail, retryCount = 3, retryDelay = 2000) {
     }
     return null;
 }
+
+const logPathMail = 'C:\\automation\\mail.txt';
 const emailFromLog = getLastEmailFromLog(logPathMail);
 
 async function getCodeByEmail(email) {
