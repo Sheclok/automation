@@ -27,13 +27,13 @@ safeLog("🤖 Automation Agent started...");
 
 // ⚙️ Text cần click
 let STEPS = [
-  { id: 1, text: "Start Install", status: "New", wait: 5, maxRetryTime: 5 },
-  { id: 2, text: "Launch Comet", status: "New", wait: 25, maxRetryTime: 5 },
-  { id: 3, text: "Get started", status: "New", wait: 30, maxRetryTime: 5 },
-  { id: 4, text: "Import", status: "New", wait: 5, maxRetryTime: 3 },
-  { id: 5, text: "Proceed without cookies", status: "New", wait: 3, maxRetryTime: 3 },
-  { id: 6, text: "Continue", status: "New", wait: 3, maxRetryTime: 3 },
-  { id: 7, text: "Open Setting", status: "New", wait: 3, maxRetryTime: 3 },
+  { id: 1, text: "Start Install", status: "New", wait: 5, maxRetryTime: 10 },
+  { id: 2, text: "Launch Comet", status: "New", wait: 25, maxRetryTime: 100 },
+  { id: 3, text: "Get started", status: "New", wait: 30, maxRetryTime: 100 },
+  { id: 4, text: "Import", status: "New", wait: 5, maxRetryTime: 100 },
+  { id: 5, text: "Proceed without cookies", status: "New", wait: 10, maxRetryTime: 10 },
+  { id: 6, text: "Continue", status: "New", wait: 3, maxRetryTime: 10 },
+  { id: 7, text: "Open Setting", status: "New", wait: 3, maxRetryTime: 10 },
   {
     id: 8,
     text: "Set default",
@@ -49,13 +49,13 @@ let STEPS = [
   safeLog("✅ Form Setting Default đã đóng!");
     },
   },
-  { id: 9, text: "Start Comet", status: "New", wait: 3, maxRetryTime: 3 },
+  { id: 9, text: "Start Comet", status: "New", wait: 3, maxRetryTime: 100 },
   {
     id: 10,
     text: "Enter your email",
     status: "New",
-    wait: 5,
-    maxRetryTime: 10,
+    wait: 10,
+    maxRetryTime: 100,
     postAction: async () => {
       const email = emailFromLog || "";
       if (!email) {
@@ -74,8 +74,8 @@ let STEPS = [
     id: 11,
     text: "Enter Code",
     status: "New",
-    wait: 5,
-    maxRetryTime: 10,
+    wait: 10,
+    maxRetryTime: 100,
     postAction: async () => {
       const code = await getCodeByEmail(emailFromLog || "");
       safeLog(`⌨️ Đang nhập code: ${code}`);
