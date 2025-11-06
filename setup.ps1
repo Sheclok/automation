@@ -89,11 +89,9 @@ if (Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue) {
 Register-ScheduledTask -Action $Action -Trigger $Trigger -TaskName $TaskName -User $User -RunLevel Highest -Force
 Write-Host "Scheduled task created: $TaskName for user $User"
 
-Write-Host "Skipping OOBE setup screens..."
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE" /v "SkipMachineOOBE" /t REG_DWORD /d 1 /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE" /v "SkipUserOOBE" /t REG_DWORD /d 1 /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE" /v "HideEULAPage" /t REG_DWORD /d 1 /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v "EnableLUA" /t REG_DWORD /d 0 /f
-Write-Host "OOBE auto-skip configured."
-
 Write-Host "=== [Setup Completed Successfully] ==="
+
+# Tự động gửi phím Enter để xác nhận OOBE/EULA nếu xuất hiện
+$wshell = New-Object -ComObject wscript.shell
+Start-Sleep -Seconds 5 # Chờ màn hình OOBE/EULA xuất hiện
+$wshell.SendKeys("{ENTER}") # Gửi phím Enter xác nhận
