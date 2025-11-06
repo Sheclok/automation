@@ -2,6 +2,25 @@ Write-Host "=== [Auto Start Edge Script Started] ==="
 $logPath = "C:\automation\start_log.txt"
 Add-Content $logPath "$(Get-Date): Script started."
 
+# "Get Started" (Welcome to Windows)
+Get-AppxPackage *Microsoft.Getstarted* | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue
+
+# Start Menu Experience Host
+New-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Force | Out-Null
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableSoftLanding" -Type DWord -Value 1
+
+# Tạo nhánh registry nếu chưa có
+New-Item -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\PushNotifications" -Force | Out-Null
+
+# Tắt toàn bộ thông báo toast
+Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\PushNotifications" -Name "ToastEnabled" -Type DWord -Value 0
+
+# Tắt banner, âm thanh, center notification
+New-Item -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings" -Force | Out-Null
+Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings" -Name "NOC_GLOBAL_SETTING_TOASTS_ENABLED" -Type DWord -Value 0
+Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings" -Name "NOC_GLOBAL_SETTING_SOUND_ENABLED" -Type DWord -Value 0
+Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings" -Name "NOC_GLOBAL_SETTING_BANNER_ENABLED" -Type DWord -Value 0
+
 # Send Enter Key 3 times every 3 seconds for oobe
 try {
     $wshell = New-Object -ComObject wscript.shell
