@@ -1,5 +1,18 @@
-Write-Host "=== [Auto Start Edge Script] ==="
+Write-Host "=== [Auto Start Edge Script Started] ==="
 $logPath = "C:\automation\start_log.txt"
+Add-Content $logPath "$(Get-Date): Script started."
+
+# Send Enter Key 3 times every 3 seconds for oobe
+try {
+    $wshell = New-Object -ComObject wscript.shell
+    for ($i = 0; $i -lt 3; $i++) {
+        Start-Sleep -Seconds 3
+        $wshell.SendKeys("{ENTER}")
+    }
+}
+catch {
+    Add-Content $logPath "$(Get-Date): Error in sending ENTER key - $_"
+}
 
 try {
     $node = "C:\Program Files\nodejs\node.exe"
