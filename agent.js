@@ -84,11 +84,27 @@ let STEPS = [
       safeLog("✅ Đã nhập code!");
     },
   },
+  {
+    id: 12,
+    text: "Ask anything",
+    status: "New",
+    wait: 2,
+    maxRetryTime: 10,    
+  },
 ];
 
-// Lấy email từ log start.js
-function getLastEmailFromLog(logPathMail) {
-  return fs.existsSync(logPathMail) ? fs.readFileSync(logPathMail, 'utf-8').trim() : null;
+// Lấy email từ log
+function getLastEmailFromLog(logPathMail, retryCount = 3, retryDelay = 2000) {
+    for (let i = 0; i < retryCount; i++) {
+      if (fs.existsSync(logPathMail)) {
+        let email = fs.readFileSync(logPathMail, 'utf-8').trim();
+        if (email) return email;
+      }
+      if (i < retryCount - 1) {
+        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, retryDelay); // Sleep sync
+      }
+    }
+    return null;
 }
 const emailFromLog = getLastEmailFromLog(logPathMail);
 
