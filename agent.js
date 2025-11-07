@@ -43,12 +43,12 @@ let STEPS = [
     wait: 5,
     maxRetryTime: 3,
     postAction: async () => {
-  safeLog("🪟 Đã mở form Setting Default — sẽ đóng lại...");
+      afeLog("🪟 Đã mở form Setting Default — sẽ đóng lại...");
       await new Promise((r) => setTimeout(r, 4000)); // chờ form hiện rõ
       await keyboard.pressKey(Key.LeftAlt, Key.F4);
       await keyboard.releaseKey(Key.LeftAlt, Key.F4);
       await new Promise((r) => setTimeout(r, 1000));
-  safeLog("✅ Form Setting Default đã đóng!");
+      safeLog("✅ Form Setting Default đã đóng!");
     },
   },
   { id: 9, text: "Start Comet", status: "New", wait: 3, maxRetryTime: 100 },
@@ -61,15 +61,15 @@ let STEPS = [
     postAction: async () => {
       const email = emailFromLog || "";
       if (!email) {
-        safeLog("❌ Không tìm thấy email, dừng tại step 10!");
-        throw new Error("Email không hợp lệ");
-      }
-      safeLog(`⌨️ Đang nhập email: ${email}`);
+        safeLog("❌ Không tìm thấy email, dừng tại step 10!");        
+      }else{
+        safeLog(`⌨️ Đang nhập email: ${email}`);
         await keyboard.type(email);
         await keyboard.pressKey(Key.Enter);
         await keyboard.releaseKey(Key.Enter);
-      await new Promise((r) => setTimeout(r, 1000));
-      safeLog("✅ Đã nhập email!");
+        await new Promise((r) => setTimeout(r, 1000));
+        safeLog("✅ Đã nhập email!");
+      }
     },
   },
   {
@@ -78,7 +78,7 @@ let STEPS = [
     status: "New",
     wait: 10,
     maxRetryTime: 100,
-    postAction: async () => {
+    postAction: async () => {                        
       const code = await getCodeByEmail(emailFromLog || "");
       safeLog(`⌨️ Đang nhập code: ${code}`);
       await keyboard.type(code);

@@ -306,6 +306,7 @@ safeLog("[START] Launching Edge...");
 
    try {
       // truyền email cho agent.js, rồi chạy main()
+      safeLog(`[INFO] Passing email to agent.js: ${info.email}`);
       require('./agent').sharedEmail = info.email;
       main().catch((error) => {
         safeLog('[ERROR] agent.js main() failed: ' + error.message);
