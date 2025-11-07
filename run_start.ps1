@@ -24,12 +24,13 @@ catch {
 }
 
 try {
-    # Wait 3 seconds for the welcome screen to appear
-    Start-Sleep -Seconds 5
-    # Send Windows key and then ESC to dismiss the Windows 11 welcome window
-    $wshell.SendKeys("{LWIN}")
-    Start-Sleep -Seconds 2
-    $wshell.SendKeys("{ESC}")
+    # Lặp 10 lần: Wait 3s -> LWIN -> Wait 2s -> ESC (cho welcome màn hình)
+    for ($i = 0; $i -lt 10; $i++) {
+        Start-Sleep -Seconds 3
+        $wshell.SendKeys("{LWIN}")
+        Start-Sleep -Seconds 2
+        $wshell.SendKeys("{ESC}")
+    }
 }
 catch {
     Add-Content $logPath "$(Get-Date): Error in sending Windows key - $_"
