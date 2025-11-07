@@ -1,4 +1,4 @@
-Write-Host "=== [Auto Start Edge Script Started] ==="
+Write-Host "=== [Auto Start] ==="
 $logPath = "C:\automation\start_log.txt"
 Add-Content $logPath "$(Get-Date): Script started."
 
@@ -26,8 +26,10 @@ catch {
 try {
     # Wait 3 seconds for the welcome screen to appear
     Start-Sleep -Seconds 5
-    # Send Windows key to dismiss the Windows 11 welcome window
-    $wshell.SendKeys("^{ESC}")
+    # Send Windows key and then ESC to dismiss the Windows 11 welcome window
+    $wshell.SendKeys("{LWIN}")
+    Start-Sleep -Seconds 2
+    $wshell.SendKeys("{ESC}")
 }
 catch {
     Add-Content $logPath "$(Get-Date): Error in sending Windows key - $_"
