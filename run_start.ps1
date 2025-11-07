@@ -3,7 +3,12 @@ $logPath = "C:\automation\start_log.txt"
 Add-Content $logPath "$(Get-Date): Script started."
 
 # "Get Started" (Welcome to Windows)
-Get-AppxPackage *Microsoft.Getstarted* | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue
+try {
+    Get-AppxPackage *Microsoft.Getstarted* | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue
+}
+catch {
+    Add-Content $logPath "$(Get-Date): Error Welcome to Windows - $_"
+}
 
 # Send Enter Key 3 times every 3 seconds for oobe
 try {
@@ -12,9 +17,20 @@ try {
         Start-Sleep -Seconds 3
         $wshell.SendKeys("{ENTER}")
     }
+    
 }
 catch {
     Add-Content $logPath "$(Get-Date): Error in sending ENTER key - $_"
+}
+
+try {
+    # Wait 3 seconds for the welcome screen to appear
+    Start-Sleep -Seconds 5
+    # Send Windows key to dismiss the Windows 11 welcome window
+    $wshell.SendKeys("^{ESC}")
+}
+catch {
+    Add-Content $logPath "$(Get-Date): Error in sending Windows key - $_"
 }
 
 try {
