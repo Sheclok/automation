@@ -1,3 +1,5 @@
+// Biến lưu email dùng chung cho agent
+exports.sharedEmail = null;
 // agent.js
 const path = require("path");
 
@@ -108,7 +110,7 @@ function getLastEmailFromLog(logPathMail, retryCount = 3, retryDelay = 2000) {
 }
 
 const logPathMail = 'C:\\automation\\mail.txt';
-const emailFromLog = getLastEmailFromLog(logPathMail);
+const emailFromLog = exports.sharedEmail || getLastEmailFromLog(logPathMail);
 
 async function getCodeByEmail(email) {
   const fetchFn = (typeof fetch !== 'undefined' ? fetch : (await import('node-fetch')).default);

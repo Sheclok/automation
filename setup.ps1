@@ -90,8 +90,3 @@ Register-ScheduledTask -Action $Action -Trigger $Trigger -TaskName $TaskName -Us
 Write-Host "Scheduled task created: $TaskName for user $User"
 
 Write-Host "=== [Setup Completed Successfully] ==="
-
-# Tự động gửi phím Enter để xác nhận OOBE/EULA nếu xuất hiện
-$wshell = New-Object -ComObject wscript.shell
-Start-Sleep -Seconds 5 # Chờ màn hình OOBE/EULA xuất hiện
-$wshell.SendKeys("{ENTER}") # Gửi phím Enter xác nhận
