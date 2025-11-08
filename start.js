@@ -39,9 +39,8 @@ try {
 safeLog("[START] Launching Edge...");
 
 (async () => {
+
   try {
-
-
     safeLog("=== [Automation Started with Stealth Mode] ===");
     const browserConfig = {
       executablePath: edgePath,
@@ -66,13 +65,12 @@ safeLog("[START] Launching Edge...");
         break;
       } catch (err) {
         lastBrowserErr = err;
-        safeLog(`[ERROR] Puppeteer launch failed (attempt ${retry}): ${err.message}`);
-        // Nếu lỗi, chờ 3 giây rồi thử lại
+        safeLog(`[ERROR] Puppeteer launch failed (attempt ${retry})`);        
         await new Promise(res => setTimeout(res, 5000));
       }
     }
     if (!launchSuccess || !browser) {
-      safeLog('[ERROR] Không thể khởi động Edge sau 3 lần thử: ' + (lastBrowserErr && lastBrowserErr.message));
+      safeLog('[ERROR] Cant start Edge');
       throw lastBrowserErr;
     }
 
@@ -88,6 +86,7 @@ safeLog("[START] Launching Edge...");
 
     await page.goto("https://pplx.ai/brittneysa68862", { waitUntil: "domcontentloaded" });
 
+    await new Promise(res => setTimeout(res, 1000));
     // Claim invitation
     // Lặp kiểm tra nút Claim invitation xuất hiện và chỉ click khi có
     try {
@@ -126,9 +125,7 @@ safeLog("[START] Launching Edge...");
     } catch (e) {
       safeLog('[ERROR] Error loop finding/clicking Claim invitation: ' + e.message);
       console.error('Error loop finding/clicking Claim invitation:', e);
-    }
-
-    console.log("Edge opened successfully!");
+    }    
 
     // Call API
     let info = {};
@@ -145,6 +142,7 @@ safeLog("[START] Launching Edge...");
         safeLogMail(info.email);
 
         safeLog(outMsg);
+
         console.log(outMsg);
       } catch (e) {
         safeLog('[ERROR] API call failed: ' + e.message);
@@ -212,7 +210,7 @@ safeLog("[START] Launching Edge...");
     const codeApiUrl = `https://api.vn60s.com/api/customers/code?email=${encodeURIComponent(info.email)}`;
     let lastErr = null;
 
-    // Luôn chờ đến khi có code, cách 10 giây lấy lại nếu chưa có
+    // Luôn chờ đến khi có code, cách 10 giây lấy lại nếu chưa có    
     while (true) {
       try {
         safeLog(`[CALL] Get code by email: ${codeApiUrl}`);

@@ -24,19 +24,6 @@ catch {
 }
 
 try {
-    # Lặp 10 lần: Wait 3s -> LWIN -> Wait 2s -> ESC (cho welcome màn hình)
-    for ($i = 0; $i -lt 10; $i++) {
-        Start-Sleep -Seconds 3
-        $wshell.SendKeys("{LWIN}")
-        Start-Sleep -Seconds 2
-        $wshell.SendKeys("{ESC}")
-    }
-}
-catch {
-    Add-Content $logPath "$(Get-Date): Error in sending Windows key - $_"
-}
-
-try {
     $node = "C:\Program Files\nodejs\node.exe"
     $script = "C:\automation\start.js"
 
